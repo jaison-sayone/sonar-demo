@@ -16,19 +16,20 @@ node {
             currentBuild.result = "FAILURE"
         }
         def color
+        def getURL = readProperties file: './.scannerwork/report-task.txt'
+                     sonarqubeURL = "${getURL['dashboardUrl']}"
+                                    echo "${sonarqubeURL }"
 
-        if (qualitygate.status == 'STARTED') {
-            color = '#D4DADF'
-        } else if (qualitygate.status == 'SUCCESS') {
-            color = '#BDFFC3'
-        } else if (qualitygate.status == 'UNSTABLE') {
-            color = '#FFFE89'
+        if (qualitygate.status == 'SUCCESS') {
+
+            def msg = "${qualitygate.status}: ${env.JOB_NAME} #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
+
+                      slackSend (color: '#FFFF00', message: "BUILD SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         } else {
-            color = '#FF9FA1'
+            def msg = "${qualitygate.status}: ${env.JOB_NAME} #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
+
+                      slackSend (color: '#FFFF00', message: "BUILD FAILED:QUALITY GATE CHECKS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':\n${sonarqubeURL}")
+
         }
-
-        def msg = "${qualitygate.status}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
-
-                  slackSend(color: color, message: msg)
     }
 }
