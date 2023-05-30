@@ -3,7 +3,7 @@ node {
         checkout scm
     }
     stage('SonarQube analysis') {
-        slackSend (color: '#FFFF00', message: "BUILD STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        slackSend (channel: 'sonarqube', color: '#0099ff', message: "SONAR ANALYSIS STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         def scannerHome = tool 'sonar-scanner';
         withSonarQubeEnv('sonardemo') {
             sh "${scannerHome}/bin/sonar-scanner"
@@ -24,11 +24,11 @@ node {
 
             def msg = "${qualitygate.status}: ${env.JOB_NAME} #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
 
-                      slackSend (color: '#FFFF00', message: "BUILD SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                      slackSend (channel: 'sonarqube', color: '#00FF00', message: "SONAR ANALYSIS SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         } else {
             def msg = "${qualitygate.status}: ${env.JOB_NAME} #${env.BUILD_NUMBER}:\n${env.BUILD_URL}"
 
-                      slackSend (color: '#FFFF00', message: "BUILD FAILED:QUALITY GATE CHECKS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':\n${sonarqubeURL}")
+                      slackSend (channel: 'sonarqube', color: '#FF0000', message: "SONAR ANALYSIS FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':\n${sonarqubeURL}")
 
         }
     }
